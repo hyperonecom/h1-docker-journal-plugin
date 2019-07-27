@@ -1,0 +1,19 @@
+{
+  "name": "h1-docker-logging-plugin",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Adam Dobrawy",
+  "license": "MIT",
+  "dependencies": {
+    "koa": "^2.7.0",
+    "koa-body": "^4.1.0",
+    "koa-logger": "^3.2.1",
+    "koa-router": "^7.4.0",
+    "protocol-buffers": "^4.1.0",
+    "superagent": "^5.1.0"
+  }
+}

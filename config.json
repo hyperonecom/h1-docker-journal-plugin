@@ -1,0 +1,19 @@
+{
+  "description": "HyperOne Journal logging plugin for Docker",
+  "documentation": "https://github.com/hyperonecom/h1-docker-logging-plugin",
+  "entrypoint": [
+    "sh",
+    "-c",
+    "node /src/index.js &> logi.txt"
+  ],
+  "workdir": "/src",
+  "interface": {
+    "types": [
+      "docker.logdriver/1.0"
+    ],
+    "socket": "h1-journal.sock"
+  },
+  "network": {
+    "type": "host"
+  }
+}
