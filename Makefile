@@ -12,7 +12,7 @@ build: docker
 	@echo "### create rootfs"
 	docker create --name tmprootfs ${PLUGIN_NAME}:${PLUGIN_TAG}
 	mkdir -p ${PLUGIN_DIR}/rootfs
-	docker export "tmprootfs" | sudo tar -x -C ${PLUGIN_DIR}/rootfs
+	docker export "tmprootfs" | tar -x -C ${PLUGIN_DIR}/rootfs
 	docker rm -vf "tmprootfs"
 	cp config.json ${PLUGIN_DIR}
 
