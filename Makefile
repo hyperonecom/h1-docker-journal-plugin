@@ -1,7 +1,7 @@
 PLUGIN_NAME=h1-docker-logging-plugin
 PLUGIN_DIR=rootfs
 PLUGIN_TAG=latest
-all: clean package install
+all: clean package enable
 package: clean docker build package
 
 docker:
