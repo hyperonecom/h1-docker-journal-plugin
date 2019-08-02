@@ -168,7 +168,7 @@ router.post('/LogDriver.StopLogging', async ctx => {
         // The kernel maintains exactly the pipe for each FIFO special file
         // that is opened by at least one process.
         const start = log.stream.bytesRead;
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise(resolve => setTimeout(resolve, 50));
         if (log.stream.bytesRead === start) break;
     }
     log.stream.close();
