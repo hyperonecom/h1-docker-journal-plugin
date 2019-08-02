@@ -1,16 +1,37 @@
 # h1-docker-journal-plugin
 
-Installation:
-```bash
-sudo make clean install enable;
+This Docker plugin extends and expands Docker's logging capabilities so that customers can push their Docker and container logs to [HyperOne Journal](http://www.hyperone.com/services/storage/logArchive/) service.
+
+## Prerequisites
+
+* HyperOne Journal [created in accordance with the documentation](http://www.hyperone.com/services/storage/logArchive/guides/creating.html),
+* password for the HyperOne indicated in the previous item
+* HyperOne service account with ```GET``` access rights to ```/logArchive/.*```
+
+## Install Docker logging plugin from source
+
+1. Clone the repository and check out release branch:
+
+```
+$ cd h1-docker-journal-plugin
+$ git checkout release
 ```
 
-Create journal:
-```bash
-h1 log create --name x --password test
+2. Build the plugin:
+
+```
+# make build
 ```
 
-Test:
+3. Enable the plugin:
+
+```.env
+$ make install enable
+```
+
+## Usage
+
+Configure the plugin separately for each container when using the docker run command. For example:
 
 ```bash
 docker run --rm --label x \
@@ -21,12 +42,43 @@ docker run --rm --label x \
 	-it alpine id
 ```
 
-Logs:
+Now that the plugin is installed and configured, it will send the container while the container is running.
 
-```bash
-sudo bash -c 'tail -f -n 1000 /var/lib/docker/plugins/*/rootfs/src/logi.txt'
+### Required variables
+
+| Name | Description |
+| -----| ------------
+| ```journal-id``` | Journal ID that will receive logs
+| ```journal-token``` | Credential (password) to journal indicated in the parameter ```journal-id```
+| ```auth-token``` | Service Account ID to read information contained in Journal
+
+### Optional variables
+
+| Name | Description | Default value
+| -----| ------------ | ---------
+| tag | TODO: See Docker's log ```tag``` option documentation | ```{{.ID}}``` (12 characters of the container ID)
+| labels | TODO: See Docker's log ```labels``` option documentation  | ```{{.ID}}``` (12 characters of the container ID)
+| env | TODO: See Docker's log ```env``` option documentation | ```{{.ID}}``` (12 characters of the container ID)
+| env-regex | A regular expression to match logging-related environment variables. Used for advanced log tag options. If there is collision between the label and env keys, env wins.  | (disabled)
+| flush-buffer-size | TODO: How many pending messages can be before sending to journal immediately. | ```500```
+| flush-interval | TODO: How long (in miliseconds) the buffer keeps buffer before flushing them. | ```15000```
+
+## Development
+
+1. Customize config.json for logging plugin stdout
+
+```.env
+  "entrypoint": ["sh","-c","node /src/index.js &> logs.txt"],
 ```
 
+2. Run following command to access logs:
+
+```bash
+sudo bash -c 'tail -f -n 1000 /var/lib/docker/plugins/*/rootfs/src/logs.txt'
+```
+## Release Notes
+
+* 1.0.0 - First version.
 
 ## Read also
 
