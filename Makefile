@@ -23,7 +23,7 @@ package: build
 clean:
 	@echo "### rm ${PLUGIN_DIR}"
 	rm -rf ${PLUGIN_DIR}
-	@docker plugin rm ${PLUGIN_NAME}:${PLUGIN_TAG} || true
+	@docker plugin rm -f ${PLUGIN_NAME}:${PLUGIN_TAG} || true
 
 install: build
 	@echo "### install plugin ${PLUGIN_NAME}:${PLUGIN_TAG}"

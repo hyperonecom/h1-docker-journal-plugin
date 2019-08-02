@@ -5,14 +5,19 @@ Installation:
 sudo make clean install enable;
 ```
 
+Create journal:
+```bash
+h1 log create --name x --password test
+```
+
 Test:
 
 ```bash
 docker run --rm --label x \
 	--log-driver 'h1-docker-logging-plugin:latest' \
-	--log-opt journal-id=xxxxxxxxx \
-	--log-opt journal-token=xxxxxxxxxx \
-	--log-opt auth-token=xxxxxxxxxx \
+	--log-opt journal-id=5d4362e4939bdbe421cb09ee \
+	--log-opt journal-token=test \
+	--log-opt auth-token=fe9ce7309e2242e38cdf18e92fc37025 \
 	-it alpine id
 ```
 
