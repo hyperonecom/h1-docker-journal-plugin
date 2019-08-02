@@ -10,6 +10,7 @@ test:node:
 
 
 test:docker:
-  image: docker:18
+  image: docker:stable
   script:
+    - apk add make
     - make all
