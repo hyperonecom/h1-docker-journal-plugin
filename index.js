@@ -5,7 +5,7 @@ const logger = require('koa-logger');
 const Router = require('koa-router');
 const fs = require('fs');
 
-const {ParseDockerStream} = require("./transform");
+const {ParseDockerStream} = require('./transform');
 
 const app = new Koa();
 const router = new Router();
@@ -30,10 +30,10 @@ const journalDriver = (config) => {
             .then(resolve)
             .catch(reject)
         ),
-        read: (read_config) => {
-
-        }
-    }
+        // read: (read_config) => {
+        //
+        // }
+    };
 };
 
 const parseBody = async (ctx, next) => {
@@ -46,7 +46,7 @@ const parseBody = async (ctx, next) => {
         ctx.req.on('error', reject);
         ctx.req.on('data', data => buffer.push(data));
         ctx.req.on('end', () => {
-            return resolve(Buffer.concat(buffer).toString('utf-8'))
+            return resolve(Buffer.concat(buffer).toString('utf-8'));
         });
     });
     if (textBody.length > 0) {
@@ -86,8 +86,8 @@ const flushLogBuffer = log => {
 
 router.get('/', ctx => {
     ctx.body = {
-        "Implements": ["LogDriver"]
-    }
+        Implements: ['LogDriver'],
+    };
 });
 
 router.post('/LogDriver.StartLogging', async ctx => {
@@ -96,7 +96,7 @@ router.post('/LogDriver.StartLogging', async ctx => {
 
     ['journal-id', 'auth-token', 'journal-token'].forEach(name => {
         if (!ctx.request.body.Info.Config[name]) {
-            return ctx.throw(400, `Missing '${name} option of log driver`)
+            return ctx.throw(400, `Missing '${name} option of log driver`);
         }
     });
 
@@ -111,28 +111,28 @@ router.post('/LogDriver.StartLogging', async ctx => {
                 received: 0,
                 send: 0,
                 success: 0,
-                failure: 0
+                failure: 0,
             },
             requests: {
                 send: 0,
                 success: 0,
-                failure: 0
-            }
-        }
+                failure: 0,
+            },
+        },
     };
 
-    log.interval = setInterval(flushLogBuffer, 15000 , log);
+    log.interval = setInterval(flushLogBuffer, 15000, log);
 
     try {
-        await log.journal.checkJournalToken()
-    }catch(err) {
-        throw ctx.throw(400, 'Invalid journal-token')
+        await log.journal.checkJournalToken();
+    } catch (err) {
+        throw ctx.throw(400, 'Invalid journal-token');
     }
 
     try {
-        await log.journal.checkAuthToken()
-    }catch(err) {
-        throw ctx.throw(400, 'Invalid auth-token')
+        await log.journal.checkAuthToken();
+    } catch (err) {
+        throw ctx.throw(400, 'Invalid auth-token');
     }
 
     containers[ctx.request.body.File] = log;
@@ -142,7 +142,7 @@ router.post('/LogDriver.StartLogging', async ctx => {
         log.buffer.push({
             source: msg.source,
             time: msg.time_nano,
-            line: msg.line.toString('utf-8')
+            line: msg.line.toString('utf-8'),
         });
         if (log.buffer.length > 1000) {
             flushLogBuffer(log);
@@ -161,30 +161,30 @@ router.post('/LogDriver.StopLogging', async ctx => {
     console.log({body: ctx.request.body});
     const log = containers[ctx.request.body.File];
     await Promise.all(log.requests);
-    console.log(ctx.request.body.File, `Waiting to read all data of log.`);
-    while(true) {
+    console.log(ctx.request.body.File, 'Waiting to read all data of log.');
+    for (;;) {
         // We must read everything before we responds.
         // However, the file being read is FIFO, which, as a rule, has no end.
         // The kernel maintains exactly the pipe for each FIFO special file
         // that is opened by at least one process.
         const start = log.stream.bytesRead;
         await new Promise(resolve => setTimeout(resolve, 100));
-        if(log.stream.bytesRead === start) break;
+        if (log.stream.bytesRead === start) break;
     }
     log.stream.close();
     flushLogBuffer(log);
     console.log(ctx.request.body.File, `Finishing log with ${log.requests.size} in fly.`);
     await Promise.all(log.requests);
-    console.log(ctx.request.body.File, "Finished processing log with following stats: ", log.stats);
-    ctx.body = {}
+    console.log(ctx.request.body.File, 'Finished processing log with following stats: ', log.stats);
+    ctx.body = {};
 });
 
 router.post('/LogDriver.Capabilities', ctx => {
     ctx.body = {
         Cap: {
-            ReadLogs: false
-        }
-    }
+            ReadLogs: false,
+        },
+    };
 });
 
 router.post('/LogDriver.ReadLogs', ctx => {
@@ -201,7 +201,7 @@ router.post('/LogDriver.ReadLogs', ctx => {
 
 app.use(async (ctx, next) => {
     try {
-        await next();
+        return await next();
     } catch (err) {
         ctx.status = err.status || 500;
         ctx.body = {Err: err.message};
@@ -214,6 +214,6 @@ app
     .use(parseBody)
     .use(router.routes())
     .use(router.allowedMethods())
-    .listen(process.env.PORT || "/run/docker/plugins/h1-journal.sock", function () {
+    .listen(process.env.PORT || '/run/docker/plugins/h1-journal.sock', function () {
         console.log('listening on', this.address());
     });

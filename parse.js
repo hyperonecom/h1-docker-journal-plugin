@@ -29,5 +29,5 @@ exports.encode = (message) => {
     const buffer = exports.messages.LogEntry.encode(message);
     const buffer2 = Buffer.alloc(4);
     buffer2.writeInt32BE(buffer.length, 0);
-    return Buffer.concat([buffer2, buffer])
+    return Buffer.concat([buffer2, buffer]);
 };

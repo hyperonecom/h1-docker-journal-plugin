@@ -1,3 +1,5 @@
+'use strict';
+
 const stream = require('stream');
 
 const {messages} = require('./parse');
@@ -12,28 +14,28 @@ class ParseDockerStream extends stream.Transform {
         this._buf = Buffer.concat([this._buf, chunk]);
         if (this._buf.length < 4) { // check if have header
             return callback(null); // wait for more data
-        } else { // check if have full body
-            let headerSize = this._buf.readUInt32BE();
-            while (this._buf.length >= 4 + headerSize) { // consume buffer
-                // parse msg
-                try {
-                    const msg = messages.LogEntry.decode(
-                        this._buf.slice(4, headerSize + 4)
-                    );
-                    this.push(msg);
-                } catch (err) {
-                    return callback(err);
-                }
-                // strip consumed data
-                this._buf = this._buf.slice(headerSize + 4);
-                // check if have header
-                if (this._buf.length < 4) {
-                    break;
-                }
-                headerSize = this._buf.readUInt32BE();
+        }  // check if have full body
+        let headerSize = this._buf.readUInt32BE();
+        while (this._buf.length >= 4 + headerSize) { // consume buffer
+            // parse msg
+            try {
+                const msg = messages.LogEntry.decode(
+                    this._buf.slice(4, headerSize + 4)
+                );
+                this.push(msg);
+            } catch (err) {
+                return callback(err);
             }
-            return callback(null);
+            // strip consumed data
+            this._buf = this._buf.slice(headerSize + 4);
+            // check if have header
+            if (this._buf.length < 4) {
+                break;
+            }
+            headerSize = this._buf.readUInt32BE();
         }
+        return callback(null);
+
     }
 }
 
@@ -45,7 +47,7 @@ class ParseJournalStream extends stream.Transform {
 
     _transform(chunk, encoding, callback) {
         this._buf = Buffer.concat([this._buf, chunk]);
-        let offset = this._buf.indexOf("\n");
+        let offset = this._buf.indexOf('\n');
         while (offset !== -1) { // consume buffer
             // parse msg
             try {
@@ -56,7 +58,7 @@ class ParseJournalStream extends stream.Transform {
                 return callback(err);
             }
             this._buf = this._buf.slice(offset + 1);
-            offset = this._buf.indexOf("\n");
+            offset = this._buf.indexOf('\n');
         }
         return callback(null);
     }
@@ -66,9 +68,9 @@ class ParseJournalStream extends stream.Transform {
             if (this._buf.length > 0) {
                 this.push(JSON.parse(this._buf.toString('utf-8')));
             }
-            cb(null);
+            return cb(null);
         } catch (err) {
-            cb(err)
+            return cb(err);
         }
     }
 
@@ -76,5 +78,5 @@ class ParseJournalStream extends stream.Transform {
 
 module.exports = {
     ParseDockerStream,
-    ParseJournalStream
+    ParseJournalStream,
 };
