@@ -1,16 +1,17 @@
 'use strict';
-
 const stream = require('stream');
 
-const {messages} = require('./parse');
+const { messages } = require('./parse');
 
 class ParseDockerStream extends stream.Transform {
     constructor(options = {}) {
-        super(Object.assign(options, {objectMode: true}));
+        super(Object.assign(options, { objectMode: true }));
         this._buf = Buffer.alloc(0);
+        this.bytes = 0;
     }
 
     _transform(chunk, encoding, callback) {
+        this.bytes += chunk.length;
         this._buf = Buffer.concat([this._buf, chunk]);
         if (this._buf.length < 4) { // check if have header
             return callback(null); // wait for more data
@@ -41,42 +42,58 @@ class ParseDockerStream extends stream.Transform {
 
 class ParseJournalStream extends stream.Transform {
     constructor(options = {}) {
-        super(Object.assign(options, {objectMode: true}));
-        this._buf = Buffer.alloc(0);
+        super(Object.assign(options, { objectMode: true }));
+        this.chunks = 0;
     }
 
     _transform(chunk, encoding, callback) {
-        this._buf = Buffer.concat([this._buf, chunk]);
-        let offset = this._buf.indexOf('\n');
-        while (offset !== -1) { // consume buffer
-            // parse msg
-            try {
-                const data = this._buf.slice(0, offset).toString('utf-8');
-                const msg = JSON.parse(data);
-                this.push(msg);
-            } catch (err) {
-                return callback(err);
-            }
-            this._buf = this._buf.slice(offset + 1);
-            offset = this._buf.indexOf('\n');
+        this.chunks += 1;
+        try {
+            return callback(null, JSON.parse(chunk));
+        } catch (err) {
+            return callback(err);
         }
+    }
+}
+
+class FilterJournalDockerStream extends stream.Transform {
+    constructor(config, options = {}) {
+        super(Object.assign(options, { objectMode: true }));
+        this.chunks = 0;
+        this.config = config;
+    }
+
+    _transform(chunk, encoding, callback) {
+        this.chunks += 1;
+        if (!['source', 'time', 'line'].every(x => Object.keys(chunk).includes(x))) {
+            return callback(null);
+        }
+        return callback(null, chunk);
+    }
+}
+
+class EncodeDockerStream extends stream.Transform {
+    constructor(options = {}) {
+        super(Object.assign(options, { objectMode: true }));
+        this.chunks = 0;
+    }
+
+    _transform(chunk, encoding, callback) {
+        this.chunks += 1;
+        chunk.line = Buffer.from(`${chunk.line}\n`);
+        const payload = messages.LogEntry.encode(chunk);
+        const header = Buffer.alloc(4);
+        header.writeInt32BE(payload.length, 0);
+        this.push(header);
+        this.push(payload);
         return callback(null);
     }
-
-    _flush(cb) {
-        try {
-            if (this._buf.length > 0) {
-                this.push(JSON.parse(this._buf.toString('utf-8')));
-            }
-            return cb(null);
-        } catch (err) {
-            return cb(err);
-        }
-    }
-
 }
+
 
 module.exports = {
     ParseDockerStream,
     ParseJournalStream,
+    FilterJournalDockerStream,
+    EncodeDockerStream,
 };

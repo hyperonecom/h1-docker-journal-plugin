@@ -1,5 +1,6 @@
 'use strict';
 const {ParseJournalStream, ParseDockerStream} = require('./transform');
+
 const test = require('ava');
 
 const header = Buffer.from('00000068', 'hex');
@@ -21,7 +22,6 @@ test('valid docker stream', async t => {
 
 test('valid journal stream', async t => {
     const x = new ParseJournalStream();
-
     let count = 0;
     await new Promise(resolve => {
         x.on('data', msg => {
@@ -30,8 +30,8 @@ test('valid journal stream', async t => {
             return resolve();
         });
         x.on('error', t.fail);
-        x.write(Buffer.from(`${JSON.stringify({x:'25'})  }\n`));
-        x.write(Buffer.from(`${JSON.stringify({x:'25'})  }\n`));
+        x.write(Buffer.from(`${JSON.stringify({x: '25'})}\n`));
+        x.write(Buffer.from(`${JSON.stringify({x: '25'})}\n`));
     });
     t.true(count === 2);
 });
