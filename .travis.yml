@@ -3,23 +3,13 @@ language: generic
 services:
   - docker
 
-jobs:
-  include:
-    - stage: test node
-      script: make node
-    - stage: test docker
-      script: make package enable
-    - stage: publish plugin
-      script: skip
-      before_deploy:
-      - docker login --username $DOCKER_USERNAME --password $DOCKER_PASSWORD $DOCKER_REGISTRY
-      deploy:
-        provider: script
-        script: make push
-        on:
-          branch: master
+script: make node package enable
 
-stages:
-  - test node
-  - test docker
-  - publish plugin
+before_deploy:
+- echo "$DOCKER_PASSWORD" | docker login "$DOCKER_REGISTRY" -u "$DOCKER_USERNAME" --password-stdin;
+
+deploy:
+  provider: script
+  script: make push
+  on:
+    branch: master

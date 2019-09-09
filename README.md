@@ -1,5 +1,7 @@
 # h1-docker-journal-plugin
 
+[![Build Status](https://travis-ci.com/hyperonecom/h1-docker-journal-plugin.svg?branch=master)](https://travis-ci.com/hyperonecom/h1-docker-journal-plugin)
+
 This Docker plugin extends and expands Docker's logging capabilities so that customers can push their Docker and container logs to [HyperOne Journal](http://www.hyperone.com/services/storage/logArchive/) service.
 
 ## Prerequisites
