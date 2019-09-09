@@ -12,7 +12,7 @@ jobs:
     - stage: publish plugin
       script: skip
       before_deploy:
-      - docker login -u "$REGISTRY_USER" -p "$REGISTRY_PASS"
+      - docker login --username $DOCKER_USERNAME --password $DOCKER_PASSWORD $DOCKER_REGISTRY
       deploy:
         provider: script
         script: make push
