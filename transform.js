@@ -5,7 +5,7 @@ const { messages } = require('./parse');
 
 class ParseDockerStream extends stream.Transform {
     constructor(options = {}) {
-        super(Object.assign(options, { objectMode: true }));
+        super({objectMode: true, ...options});
         this._buf = Buffer.alloc(0);
         this.bytes = 0;
     }
@@ -42,7 +42,7 @@ class ParseDockerStream extends stream.Transform {
 
 class ParseJournalStream extends stream.Transform {
     constructor(options = {}) {
-        super(Object.assign(options, { objectMode: true }));
+        super({objectMode: true, ...options});
         this.chunks = 0;
     }
 
@@ -57,10 +57,9 @@ class ParseJournalStream extends stream.Transform {
 }
 
 class FilterJournalDockerStream extends stream.Transform {
-    constructor(config, options = {}) {
+    constructor(options = {}) {
         super(Object.assign(options, { objectMode: true }));
         this.chunks = 0;
-        this.config = config;
     }
 
     _transform(chunk, encoding, callback) {

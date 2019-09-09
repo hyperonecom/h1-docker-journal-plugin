@@ -3,9 +3,9 @@ const test = require('ava');
 
 const { Readable } = require('stream');
 
-const driver = require('./driver');
+const driver = require('./../driver');
 
-const getRandom = () => (+new Date).toString(36);
+const getRandom = () => (+new Date()).toString(36);
 
 const hasCredentialEnv = fn => async (t, ...args) => {
     const missing = [
@@ -13,14 +13,14 @@ const hasCredentialEnv = fn => async (t, ...args) => {
     ].filter(x => !process.env[x]);
 
     if (missing.length > 0) {
-        t.fail(`Missing environment variables: ${missing.join(", ")}.`)
+        t.fail(`Missing environment variables: ${missing.join(', ')}.`);
     }
     await fn(t, ...args);
 };
 
 class LogGenerator extends Readable {
     constructor(opt) {
-        super({objectMode: true, ...opt});
+        super({ objectMode: true, ...opt });
         this._max = 100;
         this._index = 1;
     }
@@ -78,7 +78,7 @@ test.serial('driver.stopLogging without credentials raise error', async t => {
     const d = driver();
     const stream = new LogGenerator();
     const file = '/tmp/file.sock';
-    await t.throwsAsync(() => d.startLogging(stream, file, { ...defaultInfo, Config: {}}));
+    await t.throwsAsync(() => d.startLogging(stream, file, { ...defaultInfo, Config: {} }));
 });
 
 test.serial('driver.startLogging consume logs', hasCredentialEnv(async t => {

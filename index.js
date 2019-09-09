@@ -1,37 +1,17 @@
 'use strict';
 
 const Koa = require('koa');
+const coBody = require('co-body');
 const logger = require('koa-logger');
 const Router = require('koa-router');
 const fs = require('fs');
 
-const {ParseDockerStream, EncodeDockerStream} = require('./transform');
+const { ParseDockerStream, EncodeDockerStream } = require('./transform');
 
 const app = new Koa();
 const router = new Router();
 
 const driver = require('./driver')();
-
-const parseBody = async (ctx, next) => {
-    if (!['POST'].includes(ctx.request.method)) {
-        return next();
-    }
-
-    const textBody = await new Promise((resolve, reject) => {
-        const buffer = [];
-        ctx.req.on('error', reject);
-        ctx.req.on('data', data => buffer.push(data));
-        ctx.req.on('end', () => {
-            return resolve(Buffer.concat(buffer).toString('utf-8'));
-        });
-    });
-    if (textBody.length > 0) {
-        ctx.request.body = JSON.parse(textBody);
-        console.log({body: ctx.request.body})
-    }
-    return next();
-};
-
 
 router.get('/', ctx => {
     ctx.body = {
@@ -40,14 +20,13 @@ router.get('/', ctx => {
 });
 
 router.post('/LogDriver.StartLogging', async ctx => {
-    const stream = fs.createReadStream(ctx.request.body.File)
-        .pipe(new ParseDockerStream());
-    const {File, Info} = ctx.request.body;
+    const stream = fs.createReadStream(ctx.request.body.File).pipe(new ParseDockerStream());
+    const { File, Info } = ctx.request.body;
     ctx.body = await driver.startLogging(stream, File, Info);
 });
 
 router.post('/LogDriver.StopLogging', async ctx => {
-    const {File} = ctx.request.body;
+    const { File } = ctx.request.body;
     ctx.body = await driver.stopLogging(File);
 });
 
@@ -61,7 +40,7 @@ router.post('/LogDriver.Capabilities', ctx => {
 
 router.post('/LogDriver.ReadLogs', async ctx => {
     ctx.type = 'application/x-json-stream';
-    const {Info, Config} = ctx.request.body;
+    const { Info, Config } = ctx.request.body;
     const stream = (await driver.readLogs(Info, Config))
         .pipe(new EncodeDockerStream());
     ctx.status = 200;
@@ -70,19 +49,23 @@ router.post('/LogDriver.ReadLogs', async ctx => {
     ctx.body = stream;
 });
 
-app.use(async (ctx, next) => {
-    try {
-        return await next();
-    } catch (err) {
-        ctx.status = err.status || 500;
-        ctx.body = {Err: err.message};
-        ctx.app.emit('error', err, ctx);
-    }
-});
-
 app
     .use(logger())
-    .use(parseBody)
+    .use(async (ctx, next) => {
+        try {
+            return await next();
+        } catch (err) {
+            ctx.status = err.status || 500;
+            ctx.body = { Err: err.message };
+            ctx.app.emit('error', err, ctx);
+        }
+    })
+    .use(async (ctx, next) => {
+        if (ctx.req.headers['content-type'] && ctx.req.headers['content-type'].endsWith('+json')) {
+            ctx.request.body = await coBody.json(ctx.req, { limit: '10kb' });
+        }
+        return next();
+    })
     .use(router.routes())
     .use(router.allowedMethods())
     .listen(process.env.PORT || '/run/docker/plugins/h1-journal.sock', function () {

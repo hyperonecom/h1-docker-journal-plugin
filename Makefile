@@ -3,6 +3,7 @@ PLUGIN_DIR=rootfs
 PLUGIN_TAG=latest
 all: clean package enable
 package: clean docker build package
+node: clean node-install node-lint node-test
 
 docker:
 	@echo "### docker build"
@@ -34,3 +35,12 @@ install: build
 enable: install
 	@echo "### enable plugin ${PLUGIN_NAME}:${PLUGIN_TAG}"
 	docker plugin enable ${PLUGIN_NAME}:${PLUGIN_TAG}
+
+node-install:
+	docker run -v ${PWD}:/src -w /src node npm ci
+
+node-lint:
+	docker run -v ${PWD}:/src -w /src node npm run lint
+
+node-test:
+	docker run -v ${PWD}:/src -e JOURNAL_TOKEN -e JOURNAL_ID -w /src node npm run test

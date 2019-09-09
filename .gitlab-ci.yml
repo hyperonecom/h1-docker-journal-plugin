@@ -4,15 +4,6 @@ test:node:
     paths:
       - node_modules/
   script:
-    - npm install
-    - npm run lint
-    - npm run test
-
-
-test:docker:
-  image: docker:stable
-  services:
-    - docker:dind
-  script:
-    - apk add make
-    - make all
+    - docker run -v $PWD:/src -w /src node npm run ci
+    - docker run -v $PWD:/src -w /src npm run lint
+    - docker run -v $PWD:/src -w /src npm run test

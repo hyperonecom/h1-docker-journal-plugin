@@ -3,7 +3,7 @@
 const journalClient = require('./journal');
 const { ParseJournalStream } = require('./transform');
 
-module.exports = (config = {}) => {
+module.exports = () => {
     const containers = {};
 
     const flushLogBuffer = log => {
@@ -97,7 +97,7 @@ module.exports = (config = {}) => {
         for (; ;) {
             // We must read everything before we responds.
             // However, the file being read is FIFO, which has no end.
-            // The kernel maintains exactly the pipe for each FIFO special file
+            // The kernel maintains the pipe for each FIFO special file
             // that is opened by at least one writer process.
             const start = log.stream.bytesRead;
             await new Promise(resolve => setTimeout(resolve, 50));

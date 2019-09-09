@@ -1,22 +1,24 @@
 'use strict';
 const qs = require('qs');
 const logger = require('superagent-logger');
-const dayjs = require('dayjs');
 const WebSocket = require('ws');
 
 module.exports = (config) => {
     const url = `http://${config['journal-id']}.journal.pl-waw-1.hyperone.cloud/resource/${config['journal-id']}/log`;
     const agent = require('superagent').agent().use(logger);
     return {
-        checkJournalToken: () => agent.head(url).query({follow: false})
+        checkJournalToken: () => agent.head(url).query({ follow: false })
             .set('x-auth-password', config['journal-token']),
-        send: (msgs) => new Promise((resolve, reject) => agent
-            .post(url)
-            .send(Array.isArray(msgs) ? msgs : [msgs])
-            .set('x-auth-password', config['journal-token'])
-            .then(resolve)
-            .catch(reject)
-        ),
+        send: (messages) => new Promise((resolve, reject) => {
+            const body = Array.isArray(messages) ? messages : [messages];
+            const content = body.map(x => JSON.stringify(x)).join('\n');
+            return agent
+                .post(url)
+                .send(content)
+                .set('x-auth-password', config['journal-token'])
+                .then(resolve)
+                .catch(reject);
+        }),
         read: (read_config, read_info) => new Promise((resolve, reject) => {
             const query = {
                 //until: dayjs().format('YYYY-MM-DD'),

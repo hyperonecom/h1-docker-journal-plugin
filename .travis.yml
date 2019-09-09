@@ -1,0 +1,11 @@
+language: generic
+
+services:
+  - docker
+
+jobs:
+  include:
+    - stage: test node
+      script: make node
+    - stage: test docker
+      script: make package enable
