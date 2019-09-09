@@ -9,3 +9,17 @@ jobs:
       script: make node
     - stage: test docker
       script: make package enable
+    - stage: publish plugin
+      script: skip
+      before_deploy:
+      - docker login -u "$REGISTRY_USER" -p "$REGISTRY_PASS"
+      deploy:
+        provider: script
+        script: make push
+        on:
+          branch: master
+
+stages:
+  - test node
+  - test docker
+  - publish plugin
