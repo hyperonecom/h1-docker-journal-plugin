@@ -5,7 +5,7 @@ const dayjs = require('dayjs');
 const WebSocket = require('ws');
 
 module.exports = (config) => {
-    const url = `http://${config['journal-id']}.website.pl-waw-1.hyperone.cloud/resource/${config['journal-id']}/log/`;
+    const url = `http://${config['journal-id']}.journal.pl-waw-1.hyperone.cloud/resource/${config['journal-id']}/log`;
     const agent = require('superagent').agent().use(logger);
     return {
         checkJournalToken: () => agent.head(url).query({follow: false})
@@ -27,9 +27,11 @@ module.exports = (config) => {
                 },
             };
             console.log('query', query);
+
             const ws = new WebSocket(`${url}?${qs.stringify(query)}`, {
                 headers: { 'x-auth-password': config['journal-token'] },
             });
+
             ws.on('open', () => {
                 console.log(config['journal-id'], 'websocket opened');
                 const stream = WebSocket.createWebSocketStream(ws);

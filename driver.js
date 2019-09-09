@@ -65,6 +65,7 @@ module.exports = (config = {}) => {
         try {
             await log.client.checkJournalToken();
         } catch (err) {
+            console.error(err);
             throw new Error('Invalid journal-token');
         }
         log.interval = setInterval(flushLogBuffer, 15000, log);

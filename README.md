@@ -4,9 +4,8 @@ This Docker plugin extends and expands Docker's logging capabilities so that cus
 
 ## Prerequisites
 
-* HyperOne Journal [created in accordance with the documentation](http://www.hyperone.com/services/storage/logArchive/guides/creating.html),
-* password for the HyperOne indicated in the previous item
-* HyperOne service account with ```GET``` access rights to ```/logArchive/.*```
+* HyperOne Journal [created in accordance with the documentation](http://www.hyperone.com/services/storage/journal/guides/creating.html),
+* password for the HyperOne resource indicated in the previous item
 
 ## Install Docker logging plugin from source
 
@@ -38,11 +37,10 @@ docker run --rm --label x \
 	--log-driver 'h1-docker-logging-plugin:latest' \
 	--log-opt journal-id=5d4362e4939bdbe421cb09ee \
 	--log-opt journal-token=test \
-	--log-opt auth-token=fe9ce7309e2242e38cdf18e92fc37025 \
 	-it alpine id
 ```
 
-Now that the plugin is installed and configured, it will send the container while the container is running.
+Now that the plugin is installed and configured, it will send logs while the container is running.
 
 ### Required variables
 
@@ -50,18 +48,17 @@ Now that the plugin is installed and configured, it will send the container whil
 | -----| ------------
 | ```journal-id``` | Journal ID that will receive logs
 | ```journal-token``` | Credential (password) to journal indicated in the parameter ```journal-id```
-| ```auth-token``` | Service Account ID to read information contained in Journal
 
 ### Optional variables
 
-| Name | Description | Default value
-| -----| ------------ | ---------
-| tag | TODO: See Docker's log ```tag``` option documentation | ```{{.ID}}``` (12 characters of the container ID)
-| labels | TODO: See Docker's log ```labels``` option documentation  | ```{{.ID}}``` (12 characters of the container ID)
-| env | TODO: See Docker's log ```env``` option documentation | ```{{.ID}}``` (12 characters of the container ID)
-| env-regex | A regular expression to match logging-related environment variables. Used for advanced log tag options. If there is collision between the label and env keys, env wins.  | (disabled)
-| flush-buffer-size | TODO: How many pending messages can be before sending to journal immediately. | ```500```
-| flush-interval | TODO: How long (in miliseconds) the buffer keeps buffer before flushing them. | ```15000```
+|       Name        |                                                                               Description                                                                               |                   Default value                   |
+| ----------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
+| tag               | TODO: See Docker's log ```tag``` option documentation                                                                                                                   | ```{{.ID}}``` (12 characters of the container ID) |
+| labels            | TODO: See Docker's log ```labels``` option documentation                                                                                                                | ```{{.ID}}``` (12 characters of the container ID) |
+| env               | TODO: See Docker's log ```env``` option documentation                                                                                                                   | ```{{.ID}}``` (12 characters of the container ID) |
+| env-regex         | A regular expression to match logging-related environment variables. Used for advanced log tag options. If there is collision between the label and env keys, env wins. | (disabled)                                        |
+| flush-buffer-size | TODO: How many pending messages can be before sending to journal immediately.                                                                                           | ```500```                                         |
+| flush-interval    | TODO: How long (in miliseconds) the buffer keeps buffer before flushing them.                                                                                           | ```15000```                                       |
 
 ## Development
 
@@ -76,6 +73,7 @@ Now that the plugin is installed and configured, it will send the container whil
 ```bash
 sudo bash -c 'tail -f -n 1000 /var/lib/docker/plugins/*/rootfs/src/logs.txt'
 ```
+
 ## Release Notes
 
 * 1.0.0 - First version.
