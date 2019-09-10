@@ -20,7 +20,9 @@ teardown() {
 	--log-opt journal-id=${JOURNAL_ID} \
 	--log-opt journal-token=${JOURNAL_TOKEN} \
 	alpine sh -c 'echo $RANDOM; sleep 30';
-    [ "$status" -eq 0 ]
+    [ "$status" -eq 0 ];
+    # Wait for flush
+    sleep 20;
     run docker logs "${output}";
     [ "$status" -eq 0 ]
 }
