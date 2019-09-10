@@ -3,7 +3,7 @@ language: generic
 services:
   - docker
 
-script: make node package enable
+script: make node package enable integration
 
 before_deploy:
 - echo "$DOCKER_PASSWORD" | docker login "$DOCKER_REGISTRY" -u "$DOCKER_USERNAME" --password-stdin;

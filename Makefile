@@ -48,3 +48,7 @@ node-lint:
 
 node-test:
 	docker run -v ${PWD}:/src -e JOURNAL_TOKEN -e JOURNAL_ID -w /src node npm run test
+
+integration:
+	docker build -t "${PLUGIN_NAME}-e2e" tests/e2e
+	docker run -v /var/run/docker.sock:/var/run/docker.sock -e JOURNAL_TOKEN -e JOURNAL_ID "${PLUGIN_NAME}-e2e"
