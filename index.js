@@ -61,9 +61,7 @@ app
         }
     })
     .use(async (ctx, next) => {
-        if (ctx.req.headers['content-type'] && ctx.req.headers['content-type'].endsWith('+json')) {
-            ctx.request.body = await coBody.json(ctx.req, { limit: '10kb' });
-        }
+        ctx.request.body = await coBody.json(ctx.req, { limit: '10kb' });
         return next();
     })
     .use(router.routes())
