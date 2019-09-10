@@ -19,7 +19,7 @@ build: docker
 
 archive: build
 	@echo "### create package.tar.gz"
-	tar -cvzf package.tar.gz ${PLUGIN_DIR}
+	tar -czf package.tar.gz ${PLUGIN_DIR}
 
 clean:
 	@echo "### rm ${PLUGIN_DIR}"
