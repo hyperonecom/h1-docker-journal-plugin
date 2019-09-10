@@ -9,7 +9,7 @@ This Docker plugin extends and expands Docker's logging capabilities so that cus
 * HyperOne Journal [created in accordance with the documentation](http://www.hyperone.com/services/storage/journal/guides/creating.html),
 * password for the HyperOne resource indicated in the previous item
 
-## Install Docker logging plugin from ```Registry````
+## Install Docker logging plugin from ```Registry```
 
 1. Download plugin
 
