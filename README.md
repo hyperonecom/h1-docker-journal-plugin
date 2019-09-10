@@ -50,7 +50,7 @@ Configure the plugin separately for each container when using the docker run com
 
 ```bash
 docker run --rm --label x \
-	--log-driver 'h1-docker-logging-plugin:latest' \
+	--log-driver 'h1cr.io/h1-docker-logging-plugin:latest' \
 	--log-opt journal-id=5d4362e4939bdbe421cb09ee \
 	--log-opt journal-token=test \
 	-it alpine id
