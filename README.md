@@ -9,11 +9,25 @@ This Docker plugin extends and expands Docker's logging capabilities so that cus
 * HyperOne Journal [created in accordance with the documentation](http://www.hyperone.com/services/storage/journal/guides/creating.html),
 * password for the HyperOne resource indicated in the previous item
 
+## Install Docker logging plugin from ```Registry````
+
+1. Download plugin
+
+```bash
+$ docker plugin install h1cr.io/h1-docker-logging-plugin
+```
+
+2. Enable plugin
+
+```bash
+$ docker plugin enable h1cr.io/h1-docker-logging-plugin
+```
+
 ## Install Docker logging plugin from source
 
 1. Clone the repository and check out release branch:
 
-```
+```bash
 $ cd h1-docker-journal-plugin
 $ git checkout release
 ```
@@ -21,7 +35,7 @@ $ git checkout release
 2. Build the plugin:
 
 ```
-# make build
+$ make build
 ```
 
 3. Enable the plugin:
