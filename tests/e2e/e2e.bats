@@ -13,17 +13,33 @@ teardown() {
         | xargs -r docker rm -f;
 }
 
-@test "plugin sends logs" {
+@test "plugin send logs" {
+    run docker run \
+	--log-driver 'h1cr.io/h1-docker-logging-plugin:latest' \
+    --label dockerbats="$BATS_TEST_NAME" \
+	--log-opt journal-id=${JOURNAL_ID} \
+	--log-opt journal-token=${JOURNAL_TOKEN} \
+	alpine sh -c 'echo $RANDOM';
+    [ "$status" -eq 0 ];
+    containerId=$(docker container ls -a -q --filter label=dockerbats="$BATS_TEST_NAME");
+    run docker logs "${containerId}";
+    echo "Output of logs: ${output}";
+    [ "$status" -eq 0 ]
+}
+
+@test "plugin flush logs" {
     run docker run -d \
 	--log-driver 'h1cr.io/h1-docker-logging-plugin:latest' \
     --label dockerbats="$BATS_TEST_NAME" \
 	--log-opt journal-id=${JOURNAL_ID} \
 	--log-opt journal-token=${JOURNAL_TOKEN} \
-	alpine sh -c 'echo $RANDOM; sleep 30';
+	alpine sh -c 'seq 1 10; sleep 30';
     [ "$status" -eq 0 ];
-    # Wait for flush
+    # Wait for flush (15 second default)
     sleep 20;
-    run docker logs "${output}";
+    containerId=$(docker container ls -a -q --filter label=dockerbats="$BATS_TEST_NAME");
+    run docker logs "${containerId}";
+    echo "Output of logs: ${output}";
     [ "$status" -eq 0 ]
 }
 
