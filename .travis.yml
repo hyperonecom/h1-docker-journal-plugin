@@ -19,7 +19,7 @@ jobs:
           branch: master
     - stage: verify
       install: skip
-      script: make pull
+      script: make pull integration
 
 stages:
   - test
