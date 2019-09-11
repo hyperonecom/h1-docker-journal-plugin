@@ -5,8 +5,10 @@ services:
 
 jobs:
   include:
-    - stage: test
+    - name: test
       script: make node package enable integration
+    - name: deploy
+      script: skip
       before_deploy:
       - echo "$DOCKER_PASSWORD" | docker login "$DOCKER_REGISTRY" -u "$DOCKER_USERNAME" --password-stdin;
       deploy:
@@ -14,10 +16,6 @@ jobs:
         script: make push
         on:
           branch: master
-    - stage: verify
+    - name: verify
       install: skip
       script: make pull
-
-stages:
-  - build
-  - verify
