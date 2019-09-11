@@ -5,9 +5,10 @@ services:
 
 jobs:
   include:
-    - name: test
+    # A stage is a group of jobs that are allowed to run in parallel. 
+    - stage: test
       script: make node package enable integration
-    - name: deploy
+    - stage: deploy
       script: skip
       before_deploy:
       - echo "$DOCKER_PASSWORD" | docker login "$DOCKER_REGISTRY" -u "$DOCKER_USERNAME" --password-stdin;
@@ -16,6 +17,11 @@ jobs:
         script: make push
         on:
           branch: master
-    - name: verify
+    - stage: verify
       install: skip
       script: make pull
+
+stages:
+  - test
+  - deploy
+  - verify
