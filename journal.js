@@ -4,7 +4,7 @@ const logger = require('superagent-logger');
 const WebSocket = require('ws');
 
 module.exports = (config) => {
-    const url = `http://${config['journal-id']}.journal.pl-waw-1.hyperone.cloud/resource/${config['journal-id']}/log`;
+    const url = `http://${config['journal-id']}.journal.pl-waw-1.hyperone.cloud/log`;
     const agent = require('superagent').agent().use(logger);
     return {
         checkJournalToken: () => agent.head(url).query({ follow: false })
