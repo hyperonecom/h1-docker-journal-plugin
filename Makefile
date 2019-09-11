@@ -36,6 +36,10 @@ enable: install
 	@echo "### enable plugin ${PLUGIN_NAME}:${PLUGIN_TAG}"
 	docker plugin enable ${PLUGIN_NAME}:${PLUGIN_TAG}
 
+pull: clean
+	@echo "### install plugin ${PLUGIN_NAME}:${PLUGIN_TAG}"
+	docker plugin install ${PLUGIN_NAME}:${PLUGIN_TAG}
+
 push: install
 	@echo "### push plugin ${PLUGIN_NAME}:${PLUGIN_TAG}"
 	docker plugin push ${PLUGIN_NAME}:${PLUGIN_TAG}
