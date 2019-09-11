@@ -3,18 +3,21 @@ language: generic
 services:
   - docker
 
-script: make node package enable integration
-before_deploy:
-- echo "$DOCKER_PASSWORD" | docker login "$DOCKER_REGISTRY" -u "$DOCKER_USERNAME" --password-stdin;
-
-deploy:
-  provider: script
-  script: make push
-  on:
-    branch: master
-
 jobs:
   include:
-    - stage: verify installation
+    - stage: test
+      script: make node package enable integration
+      before_deploy:
+      - echo "$DOCKER_PASSWORD" | docker login "$DOCKER_REGISTRY" -u "$DOCKER_USERNAME" --password-stdin;
+      deploy:
+        provider: script
+        script: make push
+        on:
+          branch: master
+    - stage: verify
       install: skip
       script: make pull
+
+stages:
+  - build
+  - verify
