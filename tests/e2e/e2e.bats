@@ -17,7 +17,7 @@ teardown() {
     run docker run \
 	--log-driver 'h1cr.io/h1-docker-logging-plugin:latest' \
     --label dockerbats="$BATS_TEST_NAME" \
-	--log-opt journal-id=${JOURNAL_ID} \
+	--log-opt journal-fqdn=${JOURNAL_ID}.journal.pl-waw-1.hyperone.cloud \
 	--log-opt journal-token=${JOURNAL_TOKEN} \
 	alpine sh -c 'echo $RANDOM';
     [ "$status" -eq 0 ];
@@ -31,7 +31,7 @@ teardown() {
     run docker run -d \
 	--log-driver 'h1cr.io/h1-docker-logging-plugin:latest' \
     --label dockerbats="$BATS_TEST_NAME" \
-	--log-opt journal-id=${JOURNAL_ID} \
+	--log-opt journal-fqdn=${JOURNAL_ID}.journal.pl-waw-1.hyperone.cloud \
 	--log-opt journal-token=${JOURNAL_TOKEN} \
 	alpine sh -c 'seq 1 10; sleep 30';
     [ "$status" -eq 0 ];
@@ -48,7 +48,7 @@ teardown() {
     run docker run \
 	--log-driver 'h1cr.io/h1-docker-logging-plugin:latest' \
     --label dockerbats="$BATS_TEST_NAME" \
-	--log-opt journal-id=${JOURNAL_ID} \
+	--log-opt journal-fqdn=${JOURNAL_ID}.journal.pl-waw-1.hyperone.cloud \
 	--log-opt journal-token=${JOURNAL_TOKEN} \
 	alpine sh -c "seq 100 | while read line; do echo \"multiple-\${line}-${token}\"; done;";
     [ "$status" -eq 0 ]
@@ -64,7 +64,7 @@ teardown() {
 	--log-driver 'h1cr.io/h1-docker-logging-plugin:latest' \
     --label dockerbats="$BATS_TEST_NAME" \
 	alpine id;
-    [[ $output =~ "Missing 'journal-id option of log driver." ]]
+    [[ $output =~ "Missing 'journal-fqdn option of log driver." ]]
     [ "$status" -eq 125 ]
 }
 
@@ -72,7 +72,7 @@ teardown() {
     run docker run -d \
 	--log-driver 'h1cr.io/h1-docker-logging-plugin:latest' \
     --label dockerbats="$BATS_TEST_NAME" \
-	--log-opt journal-id="${JOURNAL_ID}" \
+	--log-opt journal-fqdn=${JOURNAL_ID}.journal.pl-waw-1.hyperone.cloud \
 	--log-opt journal-token="invalid token" \
 	alpine id;
     [[ $output =~ "Invalid journal-token." ]]

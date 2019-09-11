@@ -14,13 +14,13 @@ This Docker plugin extends and expands Docker's logging capabilities so that cus
 1. Download plugin
 
 ```bash
-$ docker plugin install h1cr.io/h1-docker-logging-plugin
+docker plugin install h1cr.io/h1-docker-logging-plugin
 ```
 
 2. Enable plugin
 
 ```bash
-$ docker plugin enable h1cr.io/h1-docker-logging-plugin
+docker plugin enable h1cr.io/h1-docker-logging-plugin
 ```
 
 ## Install Docker logging plugin from source
@@ -28,8 +28,8 @@ $ docker plugin enable h1cr.io/h1-docker-logging-plugin
 1. Clone the repository and check out release branch:
 
 ```bash
-$ cd h1-docker-journal-plugin
-$ git checkout release
+cd h1-docker-journal-plugin
+git checkout release
 ```
 
 2. Build the plugin:
@@ -50,10 +50,10 @@ Configure the plugin separately for each container when using the docker run com
 
 ```bash
 docker run --rm --label x \
-	--log-driver 'h1cr.io/h1-docker-logging-plugin:latest' \
-	--log-opt journal-id=5d4362e4939bdbe421cb09ee \
-	--log-opt journal-token=test \
-	-it alpine id
+    --log-driver 'h1cr.io/h1-docker-logging-plugin:latest' \
+    --log-opt journal-fqdn=5d78e1427fd7e0228fe18f46.journal.pl-waw-1.hyperone.cloud \
+    --log-opt journal-token=test \
+    -it alpine id
 ```
 
 Now that the plugin is installed and configured, it will send logs while the container is running.
@@ -62,8 +62,8 @@ Now that the plugin is installed and configured, it will send logs while the con
 
 | Name | Description |
 | -----| ------------
-| ```journal-id``` | Journal ID that will receive logs
-| ```journal-token``` | Credential (password) to journal indicated in the parameter ```journal-id```
+| ```journal-fqdn``` | Journal FQDN that will receive logs
+| ```journal-token``` | Credential (password) to journal indicated in the parameter ```journal-fqdn```
 
 ### Optional variables
 

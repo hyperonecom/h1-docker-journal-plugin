@@ -37,7 +37,7 @@ module.exports = () => {
     const driver = {};
 
     driver.startLogging = async (stream, File, Info) => {
-        ['journal-id', 'journal-token'].forEach(name => {
+        ['journal-fqdn', 'journal-token'].forEach(name => {
             if (!Info.Config[name]) {
                 throw new Error(`Missing '${name} option of log driver`);
             }

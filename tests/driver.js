@@ -40,7 +40,7 @@ class LogGenerator extends Readable {
 
 const defaultInfo = {
     Config: {
-        'journal-id': process.env.JOURNAL_ID,
+        'journal-fqdn': `${process.env.JOURNAL_ID}.journal.pl-waw-1.hyperone.cloud`,
         'journal-token': process.env.JOURNAL_TOKEN,
     },
     ContainerID: 'eddeb66fc259',
