@@ -38,7 +38,7 @@ enable: install
 
 pull: clean
 	@echo "### install plugin ${PLUGIN_NAME}:${PLUGIN_TAG}"
-	docker plugin install ${PLUGIN_NAME}:${PLUGIN_TAG}
+	docker plugin install --grant-all-permissions ${PLUGIN_NAME}:${PLUGIN_TAG}
 
 push: install
 	@echo "### push plugin ${PLUGIN_NAME}:${PLUGIN_TAG}"
