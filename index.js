@@ -21,6 +21,7 @@ router.get('/', ctx => {
 
 router.post('/LogDriver.StartLogging', async ctx => {
     const stream = fs.createReadStream(ctx.request.body.File).pipe(new ParseDockerStream());
+    console.dir({ body: ctx.request.body }, { depth: null });
     const { File, Info } = ctx.request.body;
     ctx.body = await driver.startLogging(stream, File, Info);
 });
@@ -40,6 +41,7 @@ router.post('/LogDriver.Capabilities', ctx => {
 
 router.post('/LogDriver.ReadLogs', async ctx => {
     ctx.type = 'application/x-json-stream';
+    console.log({ body: ctx.request.body }, { depth: null });
     const { Info, Config } = ctx.request.body;
     const stream = (await driver.readLogs(Info, Config))
         .pipe(new EncodeDockerStream());

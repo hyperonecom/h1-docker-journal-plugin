@@ -2,12 +2,15 @@
 
 const journalClient = require('./journal');
 const { ParseJournalStream } = require('./transform');
+const { extract_tag } = require('./utils');
 
 module.exports = () => {
     const containers = {};
 
     const flushLogBuffer = log => {
         const bufferLength = log.buffer.length;
+        if (bufferLength === 0) return;
+
         const req = log.client.send(log.buffer
         ).catch(err => {
             console.log(err);
@@ -42,6 +45,29 @@ module.exports = () => {
                 throw new Error(`Missing '${name} option of log driver`);
             }
         });
+
+        let flush_interval = 15000;
+        try {
+            flush_interval = parseInt(Info.Config['flush-interval'] || flush_interval);
+        } catch (err) {
+            console.error(err);
+            throw new Error('Invalid flush-interval', err);
+        }
+        if (flush_interval < 1500) {
+            throw new Error('Minimum value of "flush-interval" is 1500.');
+        }
+
+        let flush_buffer_size = 1000;
+        try {
+            flush_buffer_size = parseInt(Info.Config['flush-buffer-size'] || flush_buffer_size);
+        } catch (err) {
+            console.error(err);
+            throw new Error('Invalid flush_buffer_size', err);
+        }
+        if (flush_buffer_size < 50) {
+            throw new Error('Minimum value of "flush_interval" is 50.');
+        }
+
         const log = {
             stream,
             info: Info,
@@ -68,18 +94,25 @@ module.exports = () => {
             console.error(err);
             throw new Error('Invalid journal-token');
         }
-        log.interval = setInterval(flushLogBuffer, 15000, log);
+
+        log.interval = setInterval(flushLogBuffer, flush_interval, log);
 
         containers[File] = log;
 
+        const tag = {
+            containerId: Info.ContainerID,
+            containerImageName: Info.ContainerImageName,
+            containerName: Info.ContainerName,
+            ...extract_tag(Info.Config, Info),
+        };
+
         stream.on('data', msg => {
             log.stats.entry.received += 1;
-            msg.line = msg.line.toString('utf-8');
-            msg.tag = {
-                containerId: Info.ContainerID,
-            };
+            msg.message =msg.line.toString('utf-8');
+            delete msg.line;
+            msg.tag = tag;
             log.buffer.push(msg);
-            if (log.buffer.length > 1000) {
+            if (log.buffer.length > flush_buffer_size) {
                 flushLogBuffer(log);
             }
         });

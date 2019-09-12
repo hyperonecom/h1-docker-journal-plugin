@@ -49,7 +49,10 @@ class ParseJournalStream extends stream.Transform {
     _transform(chunk, encoding, callback) {
         this.chunks += 1;
         try {
-            return callback(null, JSON.parse(chunk));
+            const message = JSON.parse(chunk);
+            message.line = Buffer.from(message.message);
+            delete message.message;
+            return callback(null, message);
         } catch (err) {
             return callback(err);
         }

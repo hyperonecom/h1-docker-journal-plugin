@@ -21,13 +21,21 @@ module.exports = (config) => {
         }),
         read: (read_config, read_info) => new Promise((resolve, reject) => {
             const query = {
-                //until: dayjs().format('YYYY-MM-DD'),
-                //since: dayjs().format('YYYY-MM-DD'),
                 follow: read_config.Follow,
                 tag: {
                     containerId: read_info.ContainerID,
                 },
             };
+            if (read_config.Since !== '0001-01-01T00:00:00Z') {
+                query.since = read_config.since;
+            }
+            if (read_config.Until !== '0001-01-01T00:00:00Z') {
+                query.until = read_config.until;
+            }
+            if (read_config.Tail) {
+                query.Tail = read_config.Tail;
+            }
+
             console.log('query', query);
 
             const ws = new WebSocket(`${url}?${qs.stringify(query)}`, {
