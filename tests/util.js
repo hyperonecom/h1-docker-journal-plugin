@@ -18,7 +18,7 @@ const demo = {
         ContainerCreated: '2019-09-11T22:36:15.846941583Z',
         ContainerEnv: [
             'xxx',
-            'PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
+            'PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
         ],
         ContainerLabels: { x: '256' },
         LogPath: '',
