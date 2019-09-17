@@ -24,7 +24,6 @@ const extract_tag = (config, info) => {
 
     if (config.env && info.ContainerEnv) {
         const env = env_to_obj(info.ContainerEnv);
-        console.log(env);
         config.env.split(',').filter(x => env[x]).forEach(name => {
             tag[name] = env[name];
         });

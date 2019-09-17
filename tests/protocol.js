@@ -29,7 +29,7 @@ test('parse journal stream', async t => new Promise((resolve, reject) => {
             count+=1;
         })
         .on('error', reject)
-        .on('end', () => {
+        .on('finish', () => {
             t.true(count == 2);
             return resolve();
         });

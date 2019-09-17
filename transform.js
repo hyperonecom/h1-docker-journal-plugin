@@ -5,7 +5,7 @@ const { messages } = require('./parse');
 
 class ParseDockerStream extends stream.Transform {
     constructor(options = {}) {
-        super({objectMode: true, ...options});
+        super({ objectMode: true, ...options });
         this._buf = Buffer.alloc(0);
         this.bytes = 0;
     }
@@ -42,16 +42,18 @@ class ParseDockerStream extends stream.Transform {
 
 class ParseJournalStream extends stream.Transform {
     constructor(options = {}) {
-        super({objectMode: true, ...options});
+        super({ objectMode: true, ...options });
         this.chunks = 0;
     }
 
     _transform(chunk, encoding, callback) {
         this.chunks += 1;
         try {
-            const message = JSON.parse(chunk);
-            message.line = Buffer.from(message.message);
-            delete message.message;
+            const message = JSON.parse(chunk.toString('utf-8'));
+            if (message.message) {
+                message.line = Buffer.from(message.message);
+                delete message.message;
+            }
             return callback(null, message);
         } catch (err) {
             return callback(err);
@@ -67,7 +69,7 @@ class FilterJournalDockerStream extends stream.Transform {
 
     _transform(chunk, encoding, callback) {
         this.chunks += 1;
-        if (!['source', 'time', 'line'].every(x => Object.keys(chunk).includes(x))) {
+        if (!['source', 'time_nano', 'line'].every(x => Object.keys(chunk).includes(x))) {
             return callback(null);
         }
         return callback(null, chunk);

@@ -89,6 +89,7 @@ module.exports = () => {
             },
         };
         try {
+            console.log('Checking journal token');
             await log.client.checkJournalToken();
         } catch (err) {
             console.error(err);
@@ -108,7 +109,7 @@ module.exports = () => {
 
         stream.on('data', msg => {
             log.stats.entry.received += 1;
-            msg.message =msg.line.toString('utf-8');
+            msg.message = msg.line.toString('utf-8');
             delete msg.line;
             msg.tag = tag;
             log.buffer.push(msg);
@@ -169,7 +170,7 @@ module.exports = () => {
         // }
         const client = journalClient(Info.Config);
         const stream = await client.read(Config, Info);
-        return stream.pipe(new ParseJournalStream());
+        return stream;
     };
 
     return driver;

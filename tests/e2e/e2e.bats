@@ -16,7 +16,8 @@ teardown() {
 @test "plugin send logs" {
     run docker run \
 	--log-driver 'h1cr.io/h1-docker-logging-plugin:latest' \
-    --label dockerbats="$BATS_TEST_NAME" \
+  --label dockerbats="$BATS_TEST_NAME" \
+  --log-opt labels=dockerbats \
 	--log-opt journal-fqdn=${JOURNAL_ID}.journal.pl-waw-1.hyperone.cloud \
 	--log-opt journal-token=${JOURNAL_TOKEN} \
 	alpine sh -c 'echo $RANDOM';
@@ -30,7 +31,8 @@ teardown() {
 @test "plugin flush logs" {
     run docker run -d \
 	--log-driver 'h1cr.io/h1-docker-logging-plugin:latest' \
-    --label dockerbats="$BATS_TEST_NAME" \
+  --label dockerbats="$BATS_TEST_NAME" \
+  --log-opt labels=dockerbats \
 	--log-opt journal-fqdn=${JOURNAL_ID}.journal.pl-waw-1.hyperone.cloud \
 	--log-opt journal-token=${JOURNAL_TOKEN} \
 	alpine sh -c 'seq 1 10; sleep 30';
@@ -47,13 +49,16 @@ teardown() {
     token=${RANDOM};
     run docker run \
 	--log-driver 'h1cr.io/h1-docker-logging-plugin:latest' \
-    --label dockerbats="$BATS_TEST_NAME" \
+    --label dockerbats="$BATS_TEST_NAME-${token}" \
+    --log-opt labels=dockerbats \
 	--log-opt journal-fqdn=${JOURNAL_ID}.journal.pl-waw-1.hyperone.cloud \
 	--log-opt journal-token=${JOURNAL_TOKEN} \
 	alpine sh -c "seq 100 | while read line; do echo \"multiple-\${line}-${token}\"; done;";
     [ "$status" -eq 0 ]
-    containerId=$(docker container ls -a -q --filter label=dockerbats="$BATS_TEST_NAME");
+    containerId=$(docker container ls -a -q --filter label=dockerbats="${BATS_TEST_NAME}-${token}");
+    echo "Container id: ${containerId}";
     run docker logs "${containerId}";
+    echo "Output of logs: ${output}";
     [[ $output =~ "multiple-1-${token}" ]]
     [[ $output =~ "multiple-100-${token}" ]]
     [ "$status" -eq 0 ]
@@ -62,6 +67,7 @@ teardown() {
 @test "plugin require token" {
     run docker run -d \
 	--log-driver 'h1cr.io/h1-docker-logging-plugin:latest' \
+  --log-opt labels=dockerbats \
     --label dockerbats="$BATS_TEST_NAME" \
 	alpine id;
     [[ $output =~ "Missing 'journal-fqdn option of log driver." ]]
