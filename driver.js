@@ -1,7 +1,6 @@
 'use strict';
 
 const journalClient = require('./journal');
-const { ParseJournalStream } = require('./transform');
 const { extract_tag } = require('./utils');
 
 module.exports = () => {
