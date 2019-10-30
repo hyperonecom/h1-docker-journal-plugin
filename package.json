@@ -11,20 +11,20 @@
   "license": "MIT",
   "dependencies": {
     "co-body": "^6.0.0",
-    "dayjs": "^1.8.15",
-    "koa": "^2.7.0",
-    "koa-body": "^4.1.0",
+    "dayjs": "^1.8.16",
+    "koa": "^2.11.0",
+    "koa-body": "^4.1.1",
     "koa-logger": "^3.2.1",
     "koa-router": "^7.4.0",
     "protocol-buffers": "^4.1.0",
-    "qs": "^6.8.0",
+    "qs": "^6.9.0",
     "superagent": "^5.1.0",
     "superagent-logger": "^1.1.0",
-    "ws": "^7.1.2"
+    "ws": "^7.2.0"
   },
   "devDependencies": {
-    "@hyperone/eslint-config": "^2.0.0",
+    "@hyperone/eslint-config": "^2.0.1",
     "ava": "^2.2.0",
-    "eslint": "^6.1.0"
+    "eslint": "^6.6.0"
   }
 }
