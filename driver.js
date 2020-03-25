@@ -90,7 +90,7 @@ module.exports = () => {
             await log.client.checkJournalToken();
         } catch (err) {
             console.error(err);
-            throw new Error('Invalid/missing access data for journal');
+            throw new Error('Invalid/missing access data for journal.');
         }
 
         log.interval = setInterval(flushLogBuffer, flush_interval, log);

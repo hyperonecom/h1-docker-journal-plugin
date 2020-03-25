@@ -66,11 +66,11 @@ Each message has the following tags assigned by default. The user has the abilit
 
 * ```journal-fqdn``` – Journal FQDN that will receive logs
 
-* credential source (one of the following):
+* access data to journal indicated in the parameter ```journal-fqdn``` (one of the following):
   * password:
-    * ```journal-password``` – Credential (password) to journal indicated in the parameter ```journal-fqdn```
+    * ```journal-password``` – Credential (password) of journal
   * service account:
-    * ```journal-sa-id``` – eg. ```/iam/sa/project/5e7b89edd93046f509ca38d7/sa/5e7b89edd93046f509ca38d7```
+    * ```journal-sa-id``` – ID of service account eg. ```/iam/sa/project/5e7b89edd93046f509ca38d7/sa/5e7b89edd93046f509ca38d7```
     * ```journal-sa-kid``` – ID of certificate of service account eg. ```5e7b89edd93046f509ca38d7```
     * ```journal-private-key``` – private key of certificate added to actor
   * ```journal-credential-endpoint``` – credential endpoint eg. metadata service

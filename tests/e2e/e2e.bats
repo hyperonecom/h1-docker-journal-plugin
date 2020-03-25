@@ -70,7 +70,7 @@ teardown() {
   --log-opt labels=dockerbats \
     --label dockerbats="$BATS_TEST_NAME" \
 	alpine id;
-    [[ $output =~ "Missing 'journal-fqdn option of log driver." ]]
+    [[ $output =~ "Missing 'journal-fqdn' option of log driver." ]]
     [ "$status" -eq 125 ]
 }
 
@@ -81,6 +81,6 @@ teardown() {
 	--log-opt journal-fqdn=${JOURNAL_ID}.journal.pl-waw-1.hyperone.cloud \
 	--log-opt journal-password="invalid token" \
 	alpine id;
-    [[ $output =~ "Invalid journal-password." ]]
+    [[ $output =~ "Invalid/missing access data for journal." ]]
     [ "$status" -eq 125 ]
 }
