@@ -12,6 +12,7 @@
   "dependencies": {
     "co-body": "^6.0.0",
     "dayjs": "^1.8.23",
+    "jsonwebtoken": "^8.5.1",
     "koa": "^2.11.0",
     "koa-body": "^4.1.1",
     "koa-logger": "^3.2.1",

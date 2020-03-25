@@ -52,7 +52,7 @@ Configure the plugin separately for each container when using the docker run com
 docker run --rm --label x \
     --log-driver 'h1cr.io/h1-docker-logging-plugin:latest' \
     --log-opt journal-fqdn=5d78e1427fd7e0228fe18f46.journal.pl-waw-1.hyperone.cloud \
-    --log-opt journal-token=test \
+    --log-opt journal-password=test \
     -it alpine id
 ```
 
@@ -65,7 +65,15 @@ Each message has the following tags assigned by default. The user has the abilit
 ### Required variables
 
 * ```journal-fqdn``` – Journal FQDN that will receive logs
-* ```journal-token``` – Credential (password) to journal indicated in the parameter ```journal-fqdn```
+
+* credential source (one of the following):
+  * password:
+    * ```journal-password``` – Credential (password) to journal indicated in the parameter ```journal-fqdn```
+  * service account:
+    * ```journal-sa-id``` – eg. ```/iam/sa/project/5e7b89edd93046f509ca38d7/sa/5e7b89edd93046f509ca38d7```
+    * ```journal-sa-kid``` – ID of certificate of service account eg. ```5e7b89edd93046f509ca38d7```
+    * ```journal-private-key``` – private key of certificate added to actor
+  * ```journal-credential-endpoint``` – credential endpoint eg. metadata service
 
 ### Optional variables
 
@@ -74,6 +82,7 @@ Each message has the following tags assigned by default. The user has the abilit
 * ```env-regex``` – A regular expression to match logging-related environment variables. Used for advanced log tag options. If there is collision between the label and env keys, env wins. Disabled by default.
 * ```flush-buffer-size``` –  How many pending messages can be collected before sending to journal immediately. Default: 500
 * ```flush-interval``` –  How long (in miliseconds) the buffer keeps messages before flushing them. Default: 15000
+* ```journal-unsecure``` – Use unsecure (HTTP) connection to Journal
 
 ## Development
 

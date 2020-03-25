@@ -19,7 +19,7 @@ teardown() {
   --label dockerbats="$BATS_TEST_NAME" \
   --log-opt labels=dockerbats \
 	--log-opt journal-fqdn=${JOURNAL_ID}.journal.pl-waw-1.hyperone.cloud \
-	--log-opt journal-token=${JOURNAL_TOKEN} \
+	--log-opt journal-password=${JOURNAL_TOKEN} \
 	alpine sh -c 'echo $RANDOM';
     [ "$status" -eq 0 ];
     containerId=$(docker container ls -a -q --filter label=dockerbats="$BATS_TEST_NAME");
@@ -34,7 +34,7 @@ teardown() {
   --label dockerbats="$BATS_TEST_NAME" \
   --log-opt labels=dockerbats \
 	--log-opt journal-fqdn=${JOURNAL_ID}.journal.pl-waw-1.hyperone.cloud \
-	--log-opt journal-token=${JOURNAL_TOKEN} \
+	--log-opt journal-password=${JOURNAL_TOKEN} \
 	alpine sh -c 'seq 1 10; sleep 30';
     [ "$status" -eq 0 ];
     # Wait for flush (15 second default)
@@ -52,7 +52,7 @@ teardown() {
     --label dockerbats="$BATS_TEST_NAME-${token}" \
     --log-opt labels=dockerbats \
 	--log-opt journal-fqdn=${JOURNAL_ID}.journal.pl-waw-1.hyperone.cloud \
-	--log-opt journal-token=${JOURNAL_TOKEN} \
+	--log-opt journal-password=${JOURNAL_TOKEN} \
 	alpine sh -c "seq 100 | while read line; do echo \"multiple-\${line}-${token}\"; done;";
     [ "$status" -eq 0 ]
     containerId=$(docker container ls -a -q --filter label=dockerbats="${BATS_TEST_NAME}-${token}");
@@ -79,8 +79,8 @@ teardown() {
 	--log-driver 'h1cr.io/h1-docker-logging-plugin:latest' \
     --label dockerbats="$BATS_TEST_NAME" \
 	--log-opt journal-fqdn=${JOURNAL_ID}.journal.pl-waw-1.hyperone.cloud \
-	--log-opt journal-token="invalid token" \
+	--log-opt journal-password="invalid token" \
 	alpine id;
-    [[ $output =~ "Invalid journal-token." ]]
+    [[ $output =~ "Invalid journal-password." ]]
     [ "$status" -eq 125 ]
 }

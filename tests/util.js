@@ -7,7 +7,7 @@ const demo = {
     Info: {
         Config: {
             'journal-fqdn': '5d78e1427fd7e0228fe18f46.journal.pl-waw-1.hyperone.cloud',
-            'journal-token': 'x',
+            'journal-password': 'x',
         },
         ContainerID: '956d79af66ec1e85cc409d1153af23ace3b2b55a6fdfa2dc39cd80ff8e7416bf',
         ContainerName: '/xenodochial_jang',

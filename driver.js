@@ -39,11 +39,9 @@ module.exports = () => {
     const driver = {};
 
     driver.startLogging = async (stream, File, Info) => {
-        ['journal-fqdn', 'journal-token'].forEach(name => {
-            if (!Info.Config[name]) {
-                throw new Error(`Missing '${name} option of log driver`);
-            }
-        });
+        if (!Info.Config['journal-fqdn']) {
+            throw new Error('Missing \'journal-fqdn\' option of log driver');
+        }
 
         let flush_interval = 15000;
         try {
@@ -92,7 +90,7 @@ module.exports = () => {
             await log.client.checkJournalToken();
         } catch (err) {
             console.error(err);
-            throw new Error('Invalid journal-token');
+            throw new Error('Invalid/missing access data for journal');
         }
 
         log.interval = setInterval(flushLogBuffer, flush_interval, log);
