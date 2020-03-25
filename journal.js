@@ -33,7 +33,7 @@ module.exports = (config) => {
                 Authorization: `Bearer ${token}`,
             };
         }
-        Invalid/missing access data for journal.
+
         if (config['journal-credential-endpoint']) {
             if (!cred_req) { // no credential
                 cred_req = agent.post(config['journal-credential-endpoint'])
