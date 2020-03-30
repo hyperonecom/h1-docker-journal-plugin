@@ -19,14 +19,15 @@ module.exports = (config) => {
             return { 'x-auth-password': config['journal-password'] };
         }
 
-        if (config['journal-sa-id'] && config['journal-sa-kid'] && config['journal-private-key']) {
-            const token = jwt.sign({}, config['journal-private-key'], {
+        if (config['journal-passport']) {
+            const passport = JSON.parse(config['journal-passport'].trim());
+            const token = jwt.sign({}, passport.private_key, {
                 algorithm: 'RS256',
                 expiresIn: '5m',
-                keyid: config['journal-sa-kid'],
+                keyid: passport.certificate_id,
                 audience: config['journal-fqdn'],
-                issuer: `${API_URL}${config['journal-sa-id']}`,
-                subject: config['journal-sa-id'],
+                issuer: passport.issuer,
+                subject: passport.subject_id,
             });
 
             return {
