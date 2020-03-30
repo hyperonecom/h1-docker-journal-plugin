@@ -5,8 +5,6 @@ const jwt = require('jsonwebtoken');
 const WebSocket = require('ws');
 const { FilterJournalDockerStream, ParseJournalStream } = require('./transform');
 
-const API_URL = 'https://api.hyperone.com/v2';
-
 module.exports = (config) => {
     const proto = config['journal-unsecure'] ? 'http' : 'https';
     const url = `${proto}://${config['journal-fqdn']}/log`;
