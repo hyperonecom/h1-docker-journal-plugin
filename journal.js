@@ -5,12 +5,15 @@ const jwt = require('jsonwebtoken');
 const WebSocket = require('ws');
 const { FilterJournalDockerStream, ParseJournalStream } = require('./transform');
 
+const timeskew = 20;
+
 module.exports = (config) => {
     const proto = config['journal-unsecure'] ? 'http' : 'https';
     const url = `${proto}://${config['journal-fqdn']}/log`;
     const agent = require('superagent').agent().use(logger);
 
     let cred_req;
+    let expiresAt = 0;
 
     const get_headers = async () => {
         if (config['journal-password']) {
@@ -34,20 +37,30 @@ module.exports = (config) => {
         }
 
         if (config['journal-credential-endpoint']) {
+            const ts = Math.round(new Date().getTime() / 1000);
             if (!cred_req) { // no credential
                 cred_req = agent.post(config['journal-credential-endpoint'])
                     .set({ Metadata: 'true' })
-                    .send({ audience: config['journal-fqdn'] });
+                    .send({ audience: config['journal-fqdn'] })
+                    .then(resp => {
+                        expiresAt = ts + resp.body.expires_in - timeskew;
+                        const until = new Date(expiresAt * 1000).toISOString();
+                        console.log(`Access token refreshed. Valid until ${until}.`);
+                        return resp.body;
+                    });
             }
-            const cred_resp = await cred_req;
-            const ts = Math.round(new Date().getTime() / 1000);
+            const credential = await cred_req;
             // expired response
-            if (cred_resp.body.expires_on <= ts - 30) {
+            const exp = new Date(expiresAt * 1000).toISOString();
+            if (expiresAt < ts) {
                 cred_req = undefined;
+                console.log(`Access token is old. Expired at ${exp}. Refreshing.`);
                 console.log(`Refreshing token for ${config['journal-fqdn']}`);
                 return get_headers();
             }
-            const token = cred_resp.body.access_token;
+            console.log(`Access token is fresh. Valid until ${exp}. Re-use.`);
+
+            const token = credential.access_token;
 
             return {
                 Authorization: `Bearer ${token}`,
