@@ -1,27 +1,88 @@
 'use strict';
 const qs = require('qs');
 const logger = require('superagent-logger');
+const jwt = require('jsonwebtoken');
 const WebSocket = require('ws');
 const { FilterJournalDockerStream, ParseJournalStream } = require('./transform');
 
+const timeskew = 20;
+
 module.exports = (config) => {
-    const url = `https://${config['journal-fqdn']}/log`;
+    const proto = config['journal-unsecure'] ? 'http' : 'https';
+    const url = `${proto}://${config['journal-fqdn']}/log`;
     const agent = require('superagent').agent().use(logger);
+
+    let cred_req;
+    let expiresAt = 0;
+
+    const get_headers = async () => {
+        if (config['journal-password']) {
+            return { 'x-auth-password': config['journal-password'] };
+        }
+
+        if (config['journal-passport']) {
+            const passport = JSON.parse(config['journal-passport'].trim());
+            const token = jwt.sign({}, passport.private_key, {
+                algorithm: 'RS256',
+                expiresIn: '5m',
+                keyid: passport.certificate_id,
+                audience: config['journal-fqdn'],
+                issuer: passport.issuer,
+                subject: passport.subject_id,
+            });
+
+            return {
+                Authorization: `Bearer ${token}`,
+            };
+        }
+
+        if (config['journal-credential-endpoint']) {
+            const ts = Math.round(new Date().getTime() / 1000);
+            if (!cred_req) { // no credential
+                cred_req = agent.post(config['journal-credential-endpoint'])
+                    .set({ Metadata: 'true' })
+                    .send({ audience: config['journal-fqdn'] })
+                    .then(resp => {
+                        expiresAt = ts + resp.body.expires_in - timeskew;
+                        const until = new Date(expiresAt * 1000).toISOString();
+                        console.log(`Access token refreshed. Valid until ${until}.`);
+                        return resp.body;
+                    });
+            }
+            const credential = await cred_req;
+            // expired response
+            const exp = new Date(expiresAt * 1000).toISOString();
+            if (expiresAt < ts) {
+                cred_req = undefined;
+                console.log(`Access token is old. Expired at ${exp}. Refreshing.`);
+                console.log(`Refreshing token for ${config['journal-fqdn']}`);
+                return get_headers();
+            }
+            console.log(`Access token is fresh. Valid until ${exp}. Re-use.`);
+
+            const token = credential.access_token;
+
+            return {
+                Authorization: `Bearer ${token}`,
+            };
+        }
+
+        return {};
+    };
+
     return {
-        checkJournalToken: () => agent
+        checkJournalToken: async () => agent
             .head(url)
             .query({ follow: 'false' })
-            .set('x-auth-password', config['journal-token']),
-        send: (messages) => new Promise((resolve, reject) => {
+            .set(await get_headers()),
+        send: async (messages) => {
             const body = Array.isArray(messages) ? messages : [messages];
             const content = body.map(x => JSON.stringify(x)).join('\n');
             return agent
                 .post(url)
                 .send(content)
-                .set('x-auth-password', config['journal-token'])
-                .then(resolve)
-                .catch(reject);
-        }),
+                .set(await get_headers());
+        },
         read: (read_config, read_info) => new Promise((resolve, reject) => {
             const query = {
                 follow: read_config.Follow,
@@ -42,23 +103,26 @@ module.exports = (config) => {
             console.log('query', query);
             const ws_url = `${url}?${qs.stringify(query)}`;
             console.log('WS', ws_url);
-            const ws = new WebSocket(ws_url, {
-                headers: { 'x-auth-password': config['journal-token'] },
-            });
+            return get_headers().then(headers => {
+                const ws = new WebSocket(ws_url, {
+                    headers,
+                });
 
-            ws.on('open', () => {
-                console.log(config['journal-fqdn'], 'websocket opened');
-                const stream = WebSocket.createWebSocketStream(ws).
-                    pipe(new ParseJournalStream()).
-                    pipe(new FilterJournalDockerStream());
-                stream.pause();
-                resolve(stream);
-            });
+                ws.on('open', () => {
+                    console.log(config['journal-fqdn'], 'websocket opened');
+                    const stream = WebSocket.createWebSocketStream(ws).
+                        pipe(new ParseJournalStream()).
+                        pipe(new FilterJournalDockerStream());
+                    stream.pause();
+                    resolve(stream);
+                });
 
-            ws.on('close', () => {
-                console.log(config['journal-fqdn'], 'websocket closed');
-            });
-            ws.on('error', reject);
+                ws.on('close', () => {
+                    console.log(config['journal-fqdn'], 'websocket closed');
+                });
+                ws.on('error', reject);
+            }).catch(resolve);
+
         }),
     };
 };
