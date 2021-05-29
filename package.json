@@ -20,7 +20,7 @@
     "qs": "^6.9.2",
     "superagent": "^5.2.2",
     "superagent-logger": "^1.1.0",
-    "ws": "^7.2.3"
+    "ws": "^7.4.6"
   },
   "devDependencies": {
     "@hyperone/eslint-config": "^2.0.1",
